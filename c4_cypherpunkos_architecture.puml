@@ -1,0 +1,137 @@
+@startuml C4_CypherpunkOS_Architecture
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+LAYOUT_WITH_LEGEND()
+
+title CypherpunkOS Architecture - C4 Model
+
+'================================================================================
+' System Context Diagram
+'================================================================================
+Person(user, "User", "A person using CypherpunkOS to manage nodes, DeFi apps, and assets.")
+
+System_Ext(ethereum_l1, "Ethereum L1 Blockchain", "Public Ethereum Ledger")
+System_Ext(l2_blockchains, "L2 Blockchains", "Various Layer 2 Networks (e.g., Base, Arbitrum)")
+System_Ext(external_rpcs, "External RPC Services", "Third-party RPC providers (Infura, Alchemy, Lava, custom nodes)")
+System_Ext(external_subgraphs, "External Subgraph Services", "Third-party Subgraph providers (The Graph Network, custom)")
+
+System(cypherpunk_os, "CypherpunkOS", "Self-hosted OS for Ethereum L1/L2 node management, DeFi app integration, and asset management with privacy features.")
+
+Rel(user, cypherpunk_os, "Manages & Uses", "HTTPS/Web Browser")
+Rel(cypherpunk_os, ethereum_l1, "Interacts with (Tx, Sync, Query)", "JSON-RPC/WS")
+Rel(cypherpunk_os, l2_blockchains, "Interacts with (Tx, Sync, Query)", "JSON-RPC/WS")
+Rel(cypherpunk_os, external_rpcs, "Connects to (Optional)", "JSON-RPC/HTTPS")
+Rel(cypherpunk_os, external_subgraphs, "Connects to (Optional)", "GraphQL/HTTPS")
+
+
+'================================================================================
+' Container Diagram for CypherpunkOS
+'================================================================================
+Container_Boundary(cpos_boundary, "CypherpunkOS") {
+    Container(web_ui, "Web UI (Dashboard)", "JavaScript, HTML, CSS", "Provides the user interface for managing CypherpunkOS, apps, nodes, and wallet.")
+    Container(core_backend, "Core Backend", "Go/Node.js/Python (TBD)", "Handles core logic: settings, plugin management, network configuration, wallet operations, app proxying.")
+    Container(docker_runtime, "Docker Runtime", "Docker Engine", "Manages and isolates all plugin applications (L1/L2 nodes, DeFi apps, RPC Providers, Themes) in containers.")
+    ContainerDb(config_db, "Configuration Database", "SQLite/JSON files", "Stores CypherpunkOS settings, plugin configurations, network settings, encrypted wallet data.")
+
+    BiRel(web_ui, core_backend, "Makes API calls to", "HTTPS/WebSockets")
+    Rel(core_backend, config_db, "Reads/Writes settings & data")
+    Rel(core_backend, docker_runtime, "Manages plugin containers (start, stop, configure)")
+}
+
+' External Systems Relationships at Container Level
+Rel(core_backend, ethereum_l1, "Connects to (via local/external RPC)")
+Rel(core_backend, l2_blockchains, "Connects to (via local/external RPC)")
+Rel(core_backend, external_rpcs, "Connects to (for configured chains)")
+Rel(core_backend, external_subgraphs, "Connects to (for configured chains/apps)")
+
+
+'================================================================================
+' Component Diagram for Core Backend
+'================================================================================
+Container_Boundary(core_backend_boundary, "Core Backend") {
+    Component(api_handler, "API Handler", "Web Framework (e.g., Gin, Express)", "Exposes REST/WebSocket APIs for the Web UI and potentially external tools.")
+    Component(settings_manager, "Settings Manager", "Go/Node.js/Python", "Manages global CypherpunkOS settings, including external RPC/subgraph URLs. Persists to Config DB.")
+    Component(plugin_manager, "Plugin Manager", "Go/Node.js/Python", "Handles discovery, installation, update, and lifecycle of all plugin types (L1, L2, DeFi, RPC, Theme). Reads manifests (`cypherpunk-app.yml`).")
+    Component(network_config_resolver, "Network Config Resolver", "Go/Node.js/Python", "Resolves RPC/subgraph URLs for each chain based on user settings, local nodes, and RPC provider plugins. Provides `APP_NETWORK_CONFIGS_JSON`.")
+    Component(app_proxy, "App Proxy", "Reverse Proxy (e.g., Nginx, Caddy, or custom)", "Securely exposes plugin UIs and manages access. Applies themes.")
+    Component(wallet_backend, "Inbuilt Wallet Backend", "Go/Node.js/Python + Crypto Libraries", "Manages wallet creation, key storage (encrypted), transaction signing, and balance queries.")
+    Component(status_logger, "Status & Logging Service", "Go/Node.js/Python", "Aggregates status and logs from CypherpunkOS and plugins for display in the UI.")
+    Component(update_manager, "Update Manager", "Go/Node.js/Python", "Handles updates for CypherpunkOS core and installed plugins.")
+
+    Rel(api_handler, settings_manager, "Uses")
+    Rel(api_handler, plugin_manager, "Uses")
+    Rel(api_handler, network_config_resolver, "Uses")
+    Rel(api_handler, wallet_backend, "Uses")
+    Rel(api_handler, status_logger, "Uses")
+    Rel(api_handler, update_manager, "Uses")
+    Rel(api_handler, app_proxy, "Configures")
+
+    Rel(settings_manager, config_db, "Reads/Writes")
+    Rel(plugin_manager, docker_runtime, "Controls containers")
+    Rel(plugin_manager, config_db, "Reads/Writes plugin metadata")
+    Rel(network_config_resolver, settings_manager, "Uses global settings")
+    Rel(network_config_resolver, plugin_manager, "Uses plugin info (nodes, RPC providers)")
+    Rel(network_config_resolver, docker_runtime, "Injects env vars to app containers")
+    Rel(wallet_backend, config_db, "Reads/Writes encrypted wallet data")
+    Rel(wallet_backend, network_config_resolver, "Uses for RPC endpoints") ' For tx broadcast, balance checks
+    Rel(status_logger, docker_runtime, "Collects logs/status from containers")
+    Rel(update_manager, plugin_manager, "Coordinates plugin updates")
+
+    ' Direct relation to config_db for wallet_backend was already defined at container level if needed
+}
+
+'================================================================================
+' Dynamic Diagram (Example: User Configures an RPC Provider Plugin and a DeFi App uses it)
+'================================================================================
+' Person user
+' Container web_ui
+' Container core_backend
+' Component api_handler
+' Component settings_manager
+' Component plugin_manager
+' Component network_config_resolver
+' Container docker_runtime
+' System_Ext external_rpcs
+
+' Boundary plugins_boundary {
+'   Container(infura_plugin_container, "Infura Plugin", "Docker Container", "RPC Provider Plugin for Infura")
+'   Container(uniswap_plugin_container, "Uniswap Plugin", "Docker Container", "DeFi Application Plugin")
+' }
+' Rel(docker_runtime, infura_plugin_container, "Runs")
+' Rel(docker_runtime, uniswap_plugin_container, "Runs")
+
+
+' user -> web_ui : 1. Accesses Dashboard
+' web_ui -> core_backend : 2. API: Install Infura Plugin
+' core_backend -> plugin_manager : 3. Handles Infura install (pulls image, reads manifest)
+' plugin_manager -> docker_runtime : 4. Starts Infura container (minimal, mostly manifest data)
+' web_ui -> core_backend : 5. API: Configure Infura Plugin (enters API Key)
+' core_backend -> settings_manager : 6. Saves Infura API Key to Config DB (associated with plugin)
+
+' user -> web_ui : 7. Accesses Network Settings for Ethereum L1
+' web_ui -> core_backend : 8. API: Request L1 config options
+' core_backend -> network_config_resolver : 9. Get available RPC sources for ETH L1
+' network_config_resolver -> plugin_manager : 10. Checks for RPC Provider plugins supporting ETH L1
+' network_config_resolver -> settings_manager : 11. Checks if Infura plugin is configured (API key exists)
+' core_backend -> web_ui : 12. Returns "Infura" as an option
+
+' user -> web_ui : 13. Selects "Infura" for Ethereum L1
+' web_ui -> core_backend : 14. API: Set ETH L1 RPC to Infura
+' core_backend -> settings_manager : 15. Saves this choice in Config DB
+
+' user -> web_ui : 16. Starts Uniswap App
+' web_ui -> core_backend : 17. API: Start Uniswap Plugin
+' core_backend -> plugin_manager : 18. Instruct to start Uniswap
+' plugin_manager -> network_config_resolver : 19. Prepare APP_NETWORK_CONFIGS_JSON for Uniswap
+' network_config_resolver -> settings_manager : 20. Gets L1 RPC choice (Infura)
+' network_config_resolver -> plugin_manager : 21. Gets Infura plugin details (manifest: URL template)
+' network_config_resolver -> settings_manager : 22. Gets Infura API key
+' network_config_resolver : 23. Generates Infura RPC URL for ETH L1
+' network_config_resolver -> docker_runtime : 24. Provides APP_NETWORK_CONFIGS_JSON (with Infura RPC for ETH L1) to Uniswap container
+' plugin_manager -> docker_runtime : 25. Starts Uniswap container
+
+' uniswap_plugin_container -> external_rpcs : 26. Uniswap App uses Infura RPC URL to connect to Ethereum L1 (via Infura)
+
+@enduml 
