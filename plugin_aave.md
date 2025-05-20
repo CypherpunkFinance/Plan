@@ -33,7 +33,7 @@ This plugin allows users to connect to the Aave V3 money markets on various supp
     *   Implements `/app-status`.
     *   Reports basic status, app version, and currently configured network/RPC source.
 
-## 6. `cypherpunk-app.yml` (Aave Plugin Manifest)
+## 6. `cypherpunk-plugin.yml` (Aave Plugin Manifest)
 
 ```yaml
 id: aave-app

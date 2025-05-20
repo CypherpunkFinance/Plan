@@ -53,7 +53,7 @@ Rel(core_backend, external_subgraphs, "Connects to (for configured chains/apps)"
 Container_Boundary(core_backend_boundary, "Core Backend") {
     Component(api_handler, "API Handler", "Web Framework (e.g., Gin, Express)", "Exposes REST/WebSocket APIs for the Web UI and potentially external tools.")
     Component(settings_manager, "Settings Manager", "Go/Node.js/Python", "Manages global CypherpunkOS settings, including external RPC/subgraph URLs. Persists to Config DB.")
-    Component(plugin_manager, "Plugin Manager", "Go/Node.js/Python", "Handles discovery, installation, update, and lifecycle of all plugin types (L1, L2, DeFi, RPC, Theme). Reads manifests (`cypherpunk-app.yml`).")
+    Component(plugin_manager, "Plugin Manager", "Go/Node.js/Python", "Handles discovery, installation, update, and lifecycle of all plugin types (L1, L2, DeFi, RPC, Theme). Reads manifests (`cypherpunk-plugin.yml`).")
     Component(network_config_resolver, "Network Config Resolver", "Go/Node.js/Python", "Resolves RPC/subgraph URLs for each chain based on user settings, local nodes, and RPC provider plugins. Provides `APP_NETWORK_CONFIGS_JSON`.")
     Component(app_proxy, "App Proxy", "Reverse Proxy (e.g., Nginx, Caddy, or custom)", "Securely exposes plugin UIs and manages access. Applies themes.")
     Component(wallet_backend, "Inbuilt Wallet Backend", "Go/Node.js/Python + Crypto Libraries", "Manages wallet creation, key storage (encrypted), transaction signing, and balance queries.")

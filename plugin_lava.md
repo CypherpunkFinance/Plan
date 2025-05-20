@@ -41,7 +41,7 @@ This plugin enables users to utilize Lava Network for RPC access to multiple blo
 
 ## 5. Technical Details
 
-### 5.1. Plugin Manifest (`cypherpunk-app.yml`)
+### 5.1. Plugin Manifest (`cypherpunk-plugin.yml`)
 
 ```yaml
 id: lava-network-rpc-provider

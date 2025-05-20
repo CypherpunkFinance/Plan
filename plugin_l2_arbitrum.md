@@ -33,7 +33,7 @@ This plugin enables users to run their own Arbitrum One node, enhancing decentra
     *   Queries the local Arbitrum node for sync status and health.
     *   Reports logs.
 
-## 6. `cypherpunk-app.yml` (Arbitrum L2 Node Plugin Manifest)
+## 6. `cypherpunk-plugin.yml` (Arbitrum L2 Node Plugin Manifest)
 
 ```yaml
 id: arbitrum-one-node

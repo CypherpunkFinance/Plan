@@ -51,7 +51,7 @@ CypherpunkOS and its ecosystem will be organized into the following primary repo
     *   Ensuring the dashboard clearly indicates the source of RPC/subgraph data for each network/app.
 
 4.  **DeFi, Wallet, & Privacy Tool App Integration (Multi-Network Plugin Architecture):**
-    *   Defining a clear manifest (`cypherpunk-app.yml`) for apps to declare `supported_networks` and default `network_configs` (contract addresses, public subgraph URLs).
+    *   Defining a clear manifest (`cypherpunk-plugin.yml`) for apps to declare `supported_networks` and default `network_configs` (contract addresses, public subgraph URLs).
     *   CypherpunkOS to compile a comprehensive set of network configurations (RPCs, subgraph URLs, contract addresses) for *all* supported and available networks for an app, and provide this to the app at startup. **Apps will then handle in-app network switching using this provided configuration set.**
     *   Prioritization for data sources for an app on a specific network: User-configured global external RPC/Subgraph for that network > Local active L1/L2 Node Plugin RPC > App manifest's default public subgraph URL.
     *   **Handling App Data Sources on L2s (e.g., Subgraphs):** Default to public L2 subgraph URLs from app manifest (overridable by user global settings) if no specific local/advanced subgraph solution is active.
@@ -93,7 +93,7 @@ CypherpunkOS and its ecosystem will be organized into the following primary repo
     *   **Plugin (App) Updates:**
         *   The App Store should clearly indicate available updates for installed plugins (Nodeset, L2 Node Plugins, DeFi Apps, etc.).
         *   One-click update process for plugins from the App Store UI.
-        *   Versioning: Plugins must have clear versioning (`version` field in `cypherpunk-app.yml`). CypherpunkOS should track installed versions and available versions.
+        *   Versioning: Plugins must have clear versioning (`version` field in `cypherpunk-plugin.yml`). CypherpunkOS should track installed versions and available versions.
         *   Dependency Management: How to handle updates if a plugin update requires a newer version of CypherpunkOS or another dependency? Clear messaging to the user is key.
         *   Data Migration: For plugins that store persistent data (e.g., L1/L2 node data, wallet data, app settings), robust mechanisms for how data will be migrated or preserved during an update. This includes both the application's own data and any OS-level configuration or metadata related to the app. This is especially critical for node plugins to avoid re-syncing.
         *   Testing and Vetting: Rigorous internal testing and potentially phased rollouts or community beta testing for significant updates. Actively monitor community feedback post-release to address unforeseen issues promptly.
@@ -145,10 +145,13 @@ CypherpunkOS and its ecosystem will be organized into the following primary repo
 
 **Plugin (App) System - "Cypherpunk App Framework":**
 
-1.  **Containerization:** All local apps (Nodeset, L2 nodes, DeFi apps) run in isolated Docker containers.
+1.  **Containerization & Asset Delivery:**
+    *   **App Plugins (`plugin_type: app`) and Chain Plugins (`plugin_type: chain`)** run their services in isolated Docker containers managed by CypherpunkOS.
+    *   **Extension Plugins (`plugin_type: extension`)** primarily consist of metadata (manifest) and static assets (CSS, JS, images). While they might be packaged and distributed via a minimal Docker image for consistency in the App Store, they typically do not run their own persistent Docker services. Their assets are loaded and utilized directly by the CypherpunkOS frontend or their configuration is processed by the CypherpunkOS backend based on their manifest.
+
 2.  **App Packaging:**
-    *   **`docker-compose.yml`:** Standard Docker Compose for service definition.
-    *   **`cypherpunk-app.yml` (Manifest File):**
+    *   **`docker-compose.yml`:** Standard Docker Compose for service definition (primarily for `app` and `chain` plugins, can be minimal or absent for simple `extension` plugins that don't run services).
+    *   **`cypherpunk-plugin.yml` (Manifest File):** Crucial for all plugin types.
         *   `id`, `name`, `version`, `description`, `developer`, `website`, `repo`, `support`, `port` (if exposing UI/service), `gallery`, `path` (to UI entry point if `plugin_type: app`), `status_endpoint`.
         *   `plugin_type`: Defines how the plugin integrates and behaves. Key types:
             *   `app`: A full application with its own distinct user interface (e.g., DeFi app like Uniswap). CypherpunkOS will proxy to its UI.
@@ -326,7 +329,7 @@ This plan outlines a phased approach to building Cypherpunk Finance.
         *   Manifest details: `plugin_type: chain`.
     *   (Renumber) 6. Developing Theme Extensions (Specific type of `extension`):
         *   Theme structure (CSS, assets).
-        *   Manifest file (`cypherpunk-app.yml` with `plugin_type: extension`, `category: theme`).
+        *   Manifest file (`cypherpunk-plugin.yml` with `plugin_type: extension`, `category: theme`).
 
 ## API Reference**
     *   2. Environment Variables provided to App Plugins: Details on `APP_NETWORK_CONFIGS_JSON` structure.
@@ -382,7 +385,7 @@ This plan outlines a phased approach to building Cypherpunk Finance.
 ## Lessons
 
 *(To be updated as the project progresses)*
-*   Umbrel's app system relies heavily on Docker, `docker-compose.yml` for service definition, and an `umbrel-app.yml` manifest for metadata and App Store integration. This will be the model for Cypherpunk Apps and Node Plugins.
+*   Umbrel's app system relies heavily on Docker, `docker-compose.yml` for service definition, and an `umbrel-app.yml` manifest for metadata and App Store integration. This will be the model for Cypherpunk Apps and Node Plugins. (Note: `umbrel-app.yml` will be `cypherpunk-plugin.yml` for this project).
 *   The `app_proxy` service in Umbrel is key for managing access and authentication to apps.
 *   Environment variables (especially those prefixed with `APP_` or specific to Nodeset like `APP_NODESET_EXECUTION_RPC_URL`, and new ones like `APP_L2_BASE_RPC_URL`) are crucial for inter-app communication and configuration.
 *   Pinning Docker images to `sha256` digests is a best practice for security and reproducibility for both Cypherpunk Apps and the Ethereum clients managed by Nodeset/L2 Plugins.

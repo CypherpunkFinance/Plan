@@ -27,7 +27,7 @@ Provide a self-hosted interface for swapping tokens and managing liquidity on Un
     *   Implements `/app-status`.
     *   Reports basic status, app version, and currently configured network/RPC source.
 
-## 4. `cypherpunk-app.yml` (Uniswap Plugin Manifest)
+## 4. `cypherpunk-plugin.yml` (Uniswap Plugin Manifest)
 
 ```yaml
 id: uniswap-app

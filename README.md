@@ -12,6 +12,8 @@ For the overall project repository structure and a detailed explanation of plugi
 
 -   **`app_plugin_development.md`**: A guide detailing how to develop `plugin_type: app` plugins (e.g., Uniswap, Aave) for CypherpunkOS, based on Umbrel's app system principles.
 
+-   **`extension_plugin_development.md`**: A guide for developing Extension Plugins, covering examples like RPC Providers (metadata-driven) and UI Themes (CSS-based), emphasizing frontend loading and manifest-driven integration (`plugin_type: extension`).
+
 -   **`inbuilt_wallet.md`**: Details the design, features, and technical specifications for the integrated self-hosted wallet.
 
 -   **`l2_integration.md`**: Focuses on Layer 2 (L2) solution integration, including L2 chain plugins and L2-awareness for apps.
@@ -32,8 +34,6 @@ For the overall project repository structure and a detailed explanation of plugi
 
 -   **`plugin_uniswap.md`**: Outlines the Uniswap DeFi plugin (`plugin_type: app`).
 
--   **`theme_plugin_development.md`**: Describes development for UI Theme plugins (`plugin_type: extension`, `category: theme`).
-
 ## Directory Structure
 
 ```
@@ -42,6 +42,7 @@ plan/
 ├── app_plugin_development.md
 ├── c4_cypherpunkos_architecture.puml
 ├── cypherpunk_finance_overview.md
+├── extension_plugin_development.md
 ├── inbuilt_wallet.md
 ├── l2_integration.md
 ├── mock_ui_plan.md
@@ -52,5 +53,4 @@ plan/
 ├── plugin_lava.md
 ├── plugin_tornado_cash.md
 ├── plugin_uniswap.md
-└── theme_plugin_development.md
 ``` 

@@ -46,7 +46,7 @@ This plugin enables users to utilize their Infura API keys (Project IDs) to acce
 
 ## 5. Technical Details
 
-### 5.1. Plugin Manifest (`cypherpunk-app.yml`)
+### 5.1. Plugin Manifest (`cypherpunk-plugin.yml`)
 
 ```yaml
 id: infura-rpc-provider
