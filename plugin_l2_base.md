@@ -1,17 +1,28 @@
-# Base L2 Node Plugin for Cypherpunk Finance
+# Plugin: Base L2 Node (Chain Plugin)
 
-## 1. Objective
+## 1. Overview
 
-To provide an installable Cypherpunk App that runs a local Base L2 node *for users who choose to self-host this L2*. This plugin will enable users to have local RPC access to the Base network, which CypherpunkOS can then provide to other Cypherpunk Apps (like Uniswap or Aave) if no external Base RPC is configured by the user for the `base_mainnet` network type. It will also report its sync status and logs to the CypherpunkOS dashboard.
+- **Plugin Name:** Base Mainnet Node
+- **Plugin Type:** Chain
+- **Version:** 1.0.0 (align with a specific Base node version, e.g., OP Stack version)
+- **Author:** Coinbase / Optimism / Cypherpunk Finance Team
+- **License:** (Check OP Stack / Base Node Software License)
+- **Description:** Installs and manages a local Base Mainnet Layer 2 node. This plugin functions as a **chain** plugin, providing an L2 network endpoint for CypherpunkOS and other installed applications.
 
-## 2. Source Material & Node Software
+## 2. Purpose and Scope
+
+This plugin enables users to run their own Base Mainnet node, enhancing decentralization and providing a private RPC endpoint for their L2 interactions on the Base network. As a **chain** plugin, it focuses on node operations and exposing necessary services (like RPC) to the CypherpunkOS ecosystem.
+
+## 3. Key Features
+
+## 4. Source Material & Node Software
 
 *   **Base Node Software:** Base is built on the OP Stack (Optimism). Running a Base node typically involves running an OP Stack execution client (like `op-geth`) and an OP Stack rollup client (`op-node`).
     *   Official Base documentation: [https://docs.base.org/building-with-base/nodes/run-a-base-node](https://docs.base.org/building-with-base/nodes/run-a-base-node)
     *   Optimism Monorepo: [https://github.com/ethereum-optimism/optimism](https://github.com/ethereum-optimism/optimism)
 *   **Docker Images:** Official or community-vetted Docker images for `op-geth` and `op-node` configured for Base mainnet.
 
-## 3. Core Components & Dependencies
+## 5. Core Components & Dependencies
 
 1.  **Base L2 Node Service (e.g., `op_geth_base`, `op_node_base` in `docker-compose.yml`):**
     *   Runs `op-geth` (Execution Client for Base) and `op-node` (Rollup Client for Base).
@@ -23,43 +34,28 @@ To provide an installable Cypherpunk App that runs a local Base L2 node *for use
     *   Queries the local `op-node`/`op-geth` for sync status and health.
     *   Reports logs.
 
-## 4. `cypherpunk-app.yml` (Base L2 Node Plugin Manifest)
+## 6. `cypherpunk-app.yml` (Base L2 Node Plugin Manifest)
 
 ```yaml
-manifestVersion: 1
-id: "l2-base"
-name: "Base Node (Local)"
-version: "1.0.0"
-app_type: "l2_node"
-description: "Runs a local Base L2 node, providing a local RPC endpoint for the Base network if selected by the user as the source for Base Mainnet RPC."
-developer: "Cypherpunk Finance Community"
-website: "https://base.org"
-repo: "<link_to_cypherpunk_l2_base_plugin_repo>"
-support: "<link_to_support_channel>"
+id: base-mainnet-node
+name: Base Mainnet Node
+version: "1.0.0" # Corresponds to a specific Base node software version bundle
+plugin_type: chain # This is a chain plugin for running a node
+description: Run a local Base Mainnet Layer 2 node.
+developer: Coinbase / Cypherpunk Finance Team
+# port: 8551 # Default Base RPC port (often same as OP Stack), if exposed by this plugin
+# ... other common manifest fields ...
 
 dependencies:
-  # Declares a need for an L1 RPC provider to be configured in CypherpunkOS.
-  - "cap:ethereum_l1_rpc_available" # Generic capability identifier
+  # Requires an L1 RPC endpoint to be configured in CypherpunkOS
+  - capability: ethereum_l1_rpc_available
 
-port: 8545 # Default internal L2 RPC port for op-node
-path: "/l2-nodes/base"
-status_endpoint: "/app-status"
-
-exports:
-  - "APP_L2_BASE_RPC_URL=http://op_node_base:8545"
-  - "APP_L2_BASE_CHAIN_ID=8453"
-  - "APP_L2_BASE_NETWORK_NAME=Base Mainnet (Local Provider)"
-
-network_provided:
-  id: "base_mainnet"
-  name: "Base Mainnet"
-  chain_id: 8453
-  type: "l2_optimistic_rollup"
-  l1_dependency_type: "ethereum_l1"
-  explorer_url: "https://basescan.org"
+# custom_fields:
+#   node_software_version: "vX.Y.Z" # Specific version of OP Stack / Base node software
+#   data_dir: "/data/base-mainnet"
 ```
 
-## 5. `docker-compose.yml` (Conceptual for Base L2 Plugin)
+## 7. `docker-compose.yml` (Conceptual for Base L2 Plugin)
 
 ```yaml
 version: "3.7"
@@ -134,15 +130,15 @@ volumes:
   base_rollup_data:
 ```
 
-## 6. Key Implementation Details
+## 8. Key Implementation Details
 *   The L1 RPC URL (e.g., `APP_ETHEREUM_L1_RPC_URL`) provided to this plugin's `op-node` service will be the one CypherpunkOS has determined based on user preference (external L1 RPC or active local L1 node provider app like Nodeset).
 *   The `exports.sh` for this plugin defines the RPC URL and Chain ID that CypherpunkOS *can* use if this local Base node is the chosen RPC provider for the `base_mainnet` network type.
 
-## 7. User Interaction
+## 9. User Interaction
 *   User installs "Base Node (Local)" plugin if they want to run a local Base node.
 *   If not installed, or if an external Base RPC is configured and prioritized by the user in CypherpunkOS settings, apps needing Base access will use the external RPC.
 *   If this local plugin *is* the active RPC provider for Base (i.e., no overriding external Base RPC is set by user), other apps selecting "Base Mainnet" will be configured by CypherpunkOS to use its exported `APP_L2_BASE_RPC_URL`.
 
-## 8. Considerations
+## 10. Considerations
 *   **Resource Intensive:** Remains a consideration for users choosing to run this locally.
 *   **L1 RPC Dependency:** The L2 node plugin's stability is tied to the stability of the L1 RPC it's configured to use (which could be from a local L1 node app like Nodeset or an external service configured by the user). 

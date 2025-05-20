@@ -3,15 +3,15 @@
 ## 1. Overview
 
 - **Plugin Name:** Infura RPC Provider
-- **Plugin Type:** RPC Provider
+- **Plugin Type:** Extension (RPC Provider)
 - **Version:** 1.0.0
 - **Author:** Cypherpunk Finance Team
 - **License:** MIT (or specify)
-- **Description:** Integrates Infura as an RPC provider, allowing users to connect to various supported blockchains via their Infura account.
+- **Description:** Integrates Infura as an RPC provider, allowing users to connect to various supported blockchains via their Infura account. This plugin functions as an **extension**, integrating into the CypherpunkOS network settings UI rather than providing a standalone user interface.
 
 ## 2. Purpose and Scope
 
-This plugin enables users to utilize their Infura API keys (Project IDs) to access blockchain networks. It simplifies RPC endpoint configuration by providing "Infura" as a direct connection option for supported chains, abstracting the need to manually enter RPC URLs.
+This plugin enables users to utilize their Infura API keys (Project IDs) to access blockchain networks. It simplifies RPC endpoint configuration by providing "Infura" as a direct connection option for supported chains within the CypherpunkOS settings, abstracting the need to manually enter RPC URLs. As an **extension**, it enhances the core functionality of CypherpunkOS.
 
 ## 3. Key Features
 
@@ -52,7 +52,8 @@ This plugin enables users to utilize their Infura API keys (Project IDs) to acce
 id: infura-rpc-provider
 name: Infura RPC Provider
 version: 1.0.0
-app_type: rpc_provider # New app_type
+plugin_type: extension # Updated plugin_type
+category: rpc_provider # Specifies the type of extension
 description: Connect to blockchains using your Infura Project ID.
 developer: Cypherpunk Finance Team
 # ... other common manifest fields ...

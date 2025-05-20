@@ -6,6 +6,30 @@ This project aims to create an "Umbrel for Ethereum," providing a user-friendly 
 
 Current self-hosting solutions for Ethereum L1 and L2 infrastructure can be complex. Cypherpunk Finance seeks to simplify this by offering a curated App Store of L1/L2 node plugins (for local hosting), DeFi/tooling applications, and **UI theme plugins**, packaged for easy one-click installation and management, while also allowing users to connect to their preferred external RPC providers.
 
+## Repository Structure
+
+CypherpunkOS and its ecosystem will be organized into the following primary repositories:
+
+*   **`cypherpunkos`**: This is the main repository for the CypherpunkOS core system.
+    *   Contains the main backend service responsible for installing and managing plugins (apps, extensions, chains, themes), coordinating the starting/stopping of their services, and fetching logs.
+    *   Contains the primary frontend (Web UI/Dashboard) for browsing available plugins, installing/starting/stopping them, managing system settings, and viewing logs.
+    *   A "plugin" is a general term for any installable component. The specific `plugin_type` in its manifest will define its behavior and how it integrates.
+
+*   **`cypherpunk-apps`**: This repository will host the official collection of "app" type plugins.
+    *   Apps are plugins that have their own distinct frontend/UI, separate from the main CypherpunkOS control panel. CypherpunkOS will proxy access to these UIs.
+    *   Examples include DeFi applications like Uniswap, Aave, Tornado Cash, or wallet management tools like SAFE.
+
+*   **`cypherpunk-extensions`**: This repository will host official "extension" type plugins.
+    *   Extensions are plugins that primarily modify or enhance the CypherpunkOS control panel itself or provide backend functionalities without a dedicated UI.
+    *   Examples include RPC Provider plugins (Infura, Lava) which add new options to the CypherpunkOS network settings, or Theme plugins which change the look and feel of the CypherpunkOS control panel.
+
+*   **`cypherpunk-chains`**: This repository will host official "chain" type plugins.
+    *   Chain plugins are specifically for running and managing blockchain nodes (e.g., Ethereum L1 clients like Nodeset, L2 node clients like Base or Arbitrum).
+    *   They provide the necessary scripts and configurations for node operations and expose RPC endpoints for CypherpunkOS and other plugins to use.
+
+*   **`plan`**: (This current repository/directory)
+    *   Contains all the planning documents, architecture diagrams, and detailed specifications for implementing CypherpunkOS and its various components.
+
 ## Key Challenges and Analysis
 
 1.  **Core Ethereum L1 Node Management (Local Hosting Option):**
@@ -81,11 +105,12 @@ Current self-hosting solutions for Ethereum L1 and L2 infrastructure can be comp
         *   Providing clear changelogs for all updates (OS and plugins).
 
 **9. UI Theme Management (via Theme Plugins):**
-    *   Defining a clear structure for theme plugins (e.g., CSS overrides, image assets).
+    *   Themes are now considered a type of `extension` (`plugin_type: extension`, `category: theme`).
+    *   Defining a clear structure for theme extensions (e.g., CSS overrides, image assets).
     *   Mechanism for CypherpunkOS to apply and switch between installed themes (default "hacker" theme and user-installed ones).
     *   Ensuring theme changes do not break UI functionality or readability.
-    *   Security considerations for theme plugins (e.g., preventing malicious CSS/JS injection if themes are allowed more than CSS). For simplicity, initial themes might be restricted to CSS and static assets.
-    *   Packaging and validation process for theme plugins in the App Store.
+    *   Security considerations for theme extensions (e.g., preventing malicious CSS/JS injection if themes are allowed more than CSS). For simplicity, initial themes might be restricted to CSS and static assets.
+    *   Packaging and validation process for theme extensions in the App Store.
 
 ## High-level Overview of "Cypherpunk Finance"
 
@@ -101,12 +126,9 @@ Current self-hosting solutions for Ethereum L1 and L2 infrastructure can be comp
 *   **L2 Node Access:** Via installable local L2 node plugins, or a user-configured global external RPC for that L2 type.
 *   **Inbuilt Wallet:** A core feature of CypherpunkOS, providing a secure backend (potentially based on existing open-source solutions like Sequence Sidekick or a carefully vetted/developed custom solution) and UI for managing user funds (ETH, ERC20s) across L1 and configured L2s. It allows for key generation/import and transaction signing locally on the user's server.
 *   **App Store:** Marketplace for:
-    *   Nodeset (default L1 Ethereum node manager plugin).
-    *   Other potential L1 Node Manager Apps (e.g., Rocketpool Node).
-    *   L2 Node Plugins (e.g., Base Node, Arbitrum Node).
-    *   Cypherpunk Apps (DeFi tools, explorers, **privacy tools like the Tornado Cash Interface plugin**).
-    *   **RPC Provider Plugins (e.g., Infura, Alchemy, Lava Network)**
-    *   **Theme Plugins** (e.g., custom CSS, image assets for UI customization).
+    *   **Chain Plugins:** (e.g., Nodeset L1, Base L2, Arbitrum L2).
+    *   **App Plugins:** (e.g., Uniswap, Aave, Tornado Cash - with their own UIs).
+    *   **Extension Plugins:** (e.g., Infura RPC, Lava RPC, UI Themes - extending CypherpunkOS functionality/UI).
 *   **Web-Based UI (Dashboard):**
     *   Manages CypherpunkOS settings, including the global external RPC/subgraph configurations.
     *   Manages local node plugins (Nodeset, L2s).
@@ -114,7 +136,7 @@ Current self-hosting solutions for Ethereum L1 and L2 infrastructure can be comp
     *   Displays status/logs, clearly indicating data/RPC sources.
     *   **Integrated access to the Inbuilt Wallet.**
     *   Interface to manage and launch the Tornado Cash plugin.
-    *   **RPC Provider Plugins:** A new type of plugin that allows users to configure third-party RPC services (like Infura, Alchemy).
+    *   **RPC Provider Plugins:** (Now considered `plugin_type: extension`) A type of extension that allows users to configure third-party RPC services.
         *   **Installation & Configuration:** Users install an RPC Provider Plugin from the App Store and configure it with their API key/credentials via the plugin's settings page.
         *   **Functionality:** Once configured, the plugin makes itself available as an RPC source. CypherpunkOS, when displaying network configuration options for a specific chain, will query installed and configured RPC Provider Plugins.
         *   **Chain-Specific Options:** If an RPC Provider Plugin (e.g., Infura) supports the currently selected chain (e.g., Ethereum Mainnet), it will appear as a connection option (e.g., "Infura") alongside "Local Node" or "Manual RPC".
@@ -127,8 +149,17 @@ Current self-hosting solutions for Ethereum L1 and L2 infrastructure can be comp
 2.  **App Packaging:**
     *   **`docker-compose.yml`:** Standard Docker Compose for service definition.
     *   **`cypherpunk-app.yml` (Manifest File):**
-        *   `id`, `name`, `version`, `app_type` (e.g., `L1_node`, `L2_node`, `defi_app`, `privacy_tool`, `theme`, **`rpc_provider`**), `description`, `developer`, `website`, `repo`, `support`, `port`, `gallery`, `path`, `status_endpoint` (as previously defined or refined).
-        *   `supported_networks`: Lists network type IDs (e.g., `ethereum_l1`, `base_mainnet`). (Likely not applicable for `app_type: theme`)
+        *   `id`, `name`, `version`, `description`, `developer`, `website`, `repo`, `support`, `port` (if exposing UI/service), `gallery`, `path` (to UI entry point if `plugin_type: app`), `status_endpoint`.
+        *   `plugin_type`: Defines how the plugin integrates and behaves. Key types:
+            *   `app`: A full application with its own distinct user interface (e.g., DeFi app like Uniswap). CypherpunkOS will proxy to its UI.
+            *   `extension`: Modifies or enhances the main CypherpunkOS. This includes:
+                *   RPC Providers (e.g., Infura, Alchemy) that add configuration options to CypherpunkOS settings.
+                *   UI Themes that change the look and feel of the CypherpunkOS dashboard.
+                *   Other backend services or UI augmentations without a full separate UI.
+            *   `chain`: Manages a blockchain node (e.g., L1 node like Nodeset, L2 node like Base). Exposes RPC endpoints.
+            *   (Legacy types like `L1_node`, `L2_node`, `defi_app`, `privacy_tool`, `rpc_provider`, `theme` should be mapped to these new primary types, potentially with a clarifying `category` field if needed, e.g. `plugin_type: extension`, `category: rpc_provider` or `category: theme`).
+        *   `category` (Optional): Further specifies the type of plugin, especially for extensions (e.g., `rpc_provider`, `theme`).
+        *   `supported_networks`: Lists network type IDs (e.g., `ethereum_l1`, `base_mainnet`). (Likely not applicable for `plugin_type: theme`)
         *   `network_configs`: Provides app-specific defaults (contract addresses, default public subgraph URLs) per network ID. This is fallback information if no user-specific external subgraph is configured.
         *   `dependencies`: Becomes less critical for basic RPC access if external RPCs are configured. Apps might still depend on `cap:ethereum_l1_rpc_available` or `cap:base_mainnet_rpc_available` to signal to CypherpunkOS which networks they are interested in receiving configurations for.
     *   **`exports.sh` (Especially for Local Node Plugins like Nodeset and L2 Plugins):** These plugins export their RPC details. For Nodeset: `export APP_NODESET_L1_RPC_URL=...`, `APP_NODESET_L1_CHAIN_ID=...`. For an L2 plugin like `l2-base`: `export APP_L2_BASE_RPC_URL=...`, `APP_L2_BASE_CHAIN_ID=...`.
@@ -247,7 +278,7 @@ This plan outlines a phased approach to building Cypherpunk Finance.
 
 ## Documentation Structure Outline
 **I. Introduction**
-    *   Core Concepts (CypherpunkOS, Nodeset (default L1 app), potential for other L1 apps, L2 Node Plugins, App Plugins, External RPC/Subgraph Integration)
+    *   Core Concepts (CypherpunkOS, Plugin Types: Apps, Extensions, Chains, Nodeset as default L1 chain plugin)
 
 **II. User Guide**
     *   2.  The CypherpunkOS Dashboard:
@@ -273,20 +304,29 @@ This plan outlines a phased approach to building Cypherpunk Finance.
 
 **III. Developer Guide**
     *   1.  Cypherpunk Finance Architecture:
+        *   **Plugin Categories: Apps, Extensions (RPC Providers, Themes, etc.), Chains (based on `plugin_type`).**
         *   **Centralized Network Configuration and Endpoint Resolution by CypherpunkOS.**
         *   **Application Responsibility for In-App Network Switching.**
         *   **(New) Inbuilt Wallet Backend Architecture (Chosen approach, security considerations)**
         *   **(New) Theme Plugin Architecture and Integration.**
     *   2.  Developing L2 Node Plugins: (No major change, still about local node provision).
-    *   3.  Developing Application Plugins (DeFi tools, etc.) for L1 & L2s:
+    *   3.  Developing Application Plugins (`plugin_type: app`):
         *   Consuming `APP_NETWORK_CONFIGS_JSON`.
         *   Implementing an in-app network switcher.
         *   Designing UIs for multi-network display.
         *   **(New) Interacting with the Inbuilt Wallet (if APIs are exposed for other apps)**
-    *   **(New) 4. Developing Theme Plugins:**
+    *   (New) 4. Developing Extension Plugins (`plugin_type: extension`):
+        *   Integrating with CypherpunkOS UI (if applicable).
+        *   Providing backend services.
+        *   Example: RPC Provider extension, Theme extension.
+        *   Manifest details: `plugin_type: extension`, optional `category`.
+    *   (Renumber) 5. Developing Chain Plugins (`plugin_type: chain`):
+        *   (Previously "Developing L2 Node Plugins", now generalized for all chain types including L1).
+        *   Packaging node software, data management, exposing RPCs.
+        *   Manifest details: `plugin_type: chain`.
+    *   (Renumber) 6. Developing Theme Extensions (Specific type of `extension`):
         *   Theme structure (CSS, assets).
-        *   Manifest file (`cypherpunk-app.yml` with `app_type: theme`).
-        *   Best practices for creating compatible and appealing themes.
+        *   Manifest file (`cypherpunk-app.yml` with `plugin_type: extension`, `category: theme`).
 
 ## API Reference**
     *   2. Environment Variables provided to App Plugins: Details on `APP_NETWORK_CONFIGS_JSON` structure.

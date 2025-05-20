@@ -3,15 +3,15 @@
 ## 1. Overview
 
 - **Plugin Name:** Lava Network RPC Provider
-- **Plugin Type:** RPC Provider
+- **Plugin Type:** Extension (RPC Provider)
 - **Version:** 1.0.0
 - **Author:** Cypherpunk Finance Team
 - **License:** MIT (or specify)
-- **Description:** Integrates Lava Network as an RPC provider, allowing users to connect to various supported blockchains via Lava's decentralized network of providers.
+- **Description:** Integrates Lava Network as an RPC provider, allowing users to connect to various supported blockchains via Lava's decentralized network of providers. This plugin functions as an **extension**, integrating into the CypherpunkOS network settings UI rather than providing a standalone user interface.
 
 ## 2. Purpose and Scope
 
-This plugin enables users to utilize Lava Network for RPC access to multiple blockchains. It aims to simplify RPC endpoint configuration by providing "Lava" as a direct connection option for supported chains, leveraging Lava's public RPC infrastructure. This abstracts the need for users to manually find and manage individual RPC provider URLs for chains accessible through Lava.
+This plugin enables users to utilize Lava Network for RPC access to multiple blockchains. It aims to simplify RPC endpoint configuration by providing "Lava" as a direct connection option for supported chains within the CypherpunkOS settings, leveraging Lava's public RPC infrastructure. As an **extension**, it enhances the core functionality of CypherpunkOS.
 
 ## 3. Key Features
 
@@ -47,7 +47,8 @@ This plugin enables users to utilize Lava Network for RPC access to multiple blo
 id: lava-network-rpc-provider
 name: Lava Network RPC Provider
 version: 1.0.0
-app_type: rpc_provider
+plugin_type: extension
+category: rpc_provider
 description: Connect to blockchains using the Lava Network.
 developer: Cypherpunk Finance Team
 # ... other common manifest fields ...

@@ -1,19 +1,25 @@
-# Tornado Cash Plugin for Cypherpunk Finance
+# Plugin: Tornado Cash Application
 
-## 1. Objective
+## 1. Overview
 
-To provide a self-hosted frontend for interacting with the Tornado Cash smart contracts on supported networks (primarily Ethereum Mainnet L1, and potentially L2s where Tornado Cash contracts are verifiably deployed and accessible). This plugin aims to enhance user privacy by allowing deposits and withdrawals through their own Cypherpunk Finance instance, using their configured L1/L2 RPC endpoints.
+- **Plugin Name:** Tornado Cash Client
+- **Plugin Type:** App
+- **Version:** 1.0.0
 
-**Disclaimer:** Users must be aware of and comply with all applicable laws and regulations in their jurisdiction regarding the use of privacy tools like Tornado Cash.
+## 2. Purpose and Scope
 
-## 2. Source Material
+This plugin allows users to interact with Tornado Cash pools on supported networks (e.g., Ethereum L1) for enhanced transaction privacy. It provides a graphical interface for deposits, withdrawals, and note management. As an **app**, it operates with its own UI, launched from CypherpunkOS, and relies on CypherpunkOS for network configurations.
+
+## 3. Key Features
+
+## 4. Source Material
 
 *   **Smart Contracts:** The plugin will interact with the officially deployed and audited Tornado Cash smart contracts. Contract addresses will need to be verified for each supported network.
 *   **Frontend Source:** Several open-source Tornado Cash frontends have existed. A well-maintained, audited, and community-trusted fork would need to be identified or a new secure interface developed if no suitable open-source frontend is readily adaptable. Given the sensitivities, security and verifiability of the chosen frontend code are paramount.
     *   Example historical reference (may not be current or secure): `tornadocash/ui` or `tornadocash/classic-ui` (research needed for a viable base).
 *   **Zero-Knowledge Proofs:** Tornado Cash relies on zk-SNARKs. The frontend will need to handle proof generation (usually done client-side in JavaScript/WASM) and potentially download proving keys.
 
-## 3. Core Components & Dependencies
+## 5. Core Components & Dependencies
 
 1.  **Frontend Service (`frontend` in `docker-compose.yml`):**
     *   **Image:** A Docker image built from a secure and audited Tornado Cash UI fork/implementation.
@@ -30,16 +36,15 @@ To provide a self-hosted frontend for interacting with the Tornado Cash smart co
     *   Implements `/app-status`.
     *   Reports basic status (e.g., "running", app version), configured network, and potentially the status of proving key availability.
 
-## 4. `cypherpunk-app.yml` (Tornado Cash Plugin Manifest)
+## 6. `cypherpunk-app.yml` (Tornado Cash Plugin Manifest)
 
 ```yaml
-manifestVersion: 1
-id: "tornado-cash-interface"
-name: "Tornado Cash Interface"
-version: "1.0.0" # Based on chosen UI fork/implementation + packaging
-app_type: "privacy_tool"
-description: "Provides a self-hosted interface to interact with Tornado Cash smart contracts for enhanced transaction privacy. Use responsibly and in accordance with local laws."
-developer: "Cypherpunk Finance Community / Adapted from original TC developers & community forks"
+id: tornadocash-app
+name: Tornado Cash Client
+version: 1.0.0
+plugin_type: app
+description: Make private transactions with Tornado Cash.
+developer: Tornado Cash Community / Cypherpunk Finance Team
 website: "<official_tornado_cash_info_site_if_any_or_protocol_spec>"
 repo: "<link_to_cypherpunk_tornado_cash_plugin_repo>"
 support: "<link_to_support_channel>"
@@ -81,7 +86,7 @@ status_endpoint: "/app-status"
 security_implications: "high"
 ```
 
-## 5. `docker-compose.yml` (Conceptual for Tornado Cash Plugin)
+## 7. `docker-compose.yml` (Conceptual for Tornado Cash Plugin)
 
 ```yaml
 version: "3.7"
@@ -115,7 +120,7 @@ services:
 *   The UI must be configured using the injected environment variables for network details, contract addresses, and potentially proving key locations.
 *   Crucially, the handling of user-generated notes (the secret for withdrawals) must be done securely on the client-side. The plugin should offer robust ways for users to back up and restore these notes, possibly encrypted.
 
-## 6. Build & Deployment Process
+## 8. Build & Deployment Process
 
 1.  **Select/Fork/Develop Secure Frontend:** This is the most critical step. The chosen UI code must be thoroughly vetted for security and correctness.
 2.  **Integrate Network Configuration:** Adapt the frontend to use dynamic network configurations provided by CypherpunkOS via environment variables.
@@ -124,7 +129,7 @@ services:
 5.  **Package Plugin:** Create `cypherpunk-app.yml` and `docker-compose.yml`.
 6.  **Rigorous Testing:** Test deposit/withdrawal on L1 and supported L2s, using both local and external RPCs. Test note management.
 
-## 7. User Interaction Flow
+## 9. User Interaction Flow
 
 *   User installs Tornado Cash plugin.
 *   User selects a supported network (e.g., "Ethereum Mainnet" or "Arbitrum One") within the Tornado Cash app UI (the app receives all valid network configs from CypherpunkOS at startup).
@@ -132,7 +137,7 @@ services:
 *   User performs deposit: generates a note, submits transaction.
 *   User performs withdrawal: provides note, frontend generates proof, submits transaction.
 
-## 8. Considerations & Challenges
+## 10. Considerations & Challenges
 
 *   **Security of Frontend Code:** This is paramount. Using unaudited or questionable frontend code is a major risk.
 *   **Note Management:** Secure client-side handling, backup, and restoration of user notes is vital. Loss of a note means loss of funds in that deposit.

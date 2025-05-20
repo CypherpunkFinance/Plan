@@ -1,16 +1,27 @@
-# Arbitrum One L2 Node Plugin for Cypherpunk Finance
+# Plugin: Arbitrum L2 Node (Chain Plugin)
 
-## 1. Objective
+## 1. Overview
 
-To provide an installable Cypherpunk App that runs a full Arbitrum One L2 node *for users who choose to self-host this L2*. This plugin will enable users to have local RPC access to the Arbitrum One network, which CypherpunkOS can then provide to other Cypherpunk Apps if no external Arbitrum RPC is configured by the user for the `arbitrum_one` network type. It will also report its sync status and logs to the CypherpunkOS dashboard.
+- **Plugin Name:** Arbitrum One Node
+- **Plugin Type:** Chain
+- **Version:** 1.0.0 (align with a specific Arbitrum node version)
+- **Author:** Offchain Labs / Cypherpunk Finance Team
+- **License:** (Check Arbitrum Node Software License)
+- **Description:** Installs and manages a local Arbitrum One Layer 2 node. This plugin functions as a **chain** plugin, providing an L2 network endpoint for CypherpunkOS and other installed applications.
 
-## 2. Source Material & Node Software
+## 2. Purpose and Scope
+
+This plugin enables users to run their own Arbitrum One node, enhancing decentralization and providing a private RPC endpoint for their L2 interactions. As a **chain** plugin, it focuses on node operations and exposing necessary services (like RPC) to the CypherpunkOS ecosystem.
+
+## 3. Key Features
+
+## 4. Source Material & Node Software
 
 *   **Arbitrum Node Software:** Running an Arbitrum One node typically involves using Nitro, the current Arbitrum technology stack. This requires a synced L1 Ethereum node and the Arbitrum node software itself.
     *   Official Arbitrum documentation: [https://docs.arbitrum.io/node-running/how-tos/running-a-full-node](https://docs.arbitrum.io/node-running/how-tos/running-a-full-node)
 *   **Docker Images:** Official or community-vetted Docker images for Arbitrum Nitro nodes configured for Arbitrum One mainnet will be used (e.g., `offchainlabs/nitro-node`).
 
-## 3. Core Components & Dependencies
+## 5. Core Components & Dependencies
 
 1.  **Arbitrum L2 Node Service (`arbitrum-node` in `docker-compose.yml`):**
     *   Runs the Arbitrum Nitro node software.
@@ -22,42 +33,28 @@ To provide an installable Cypherpunk App that runs a full Arbitrum One L2 node *
     *   Queries the local Arbitrum node for sync status and health.
     *   Reports logs.
 
-## 4. `cypherpunk-app.yml` (Arbitrum L2 Node Plugin Manifest)
+## 6. `cypherpunk-app.yml` (Arbitrum L2 Node Plugin Manifest)
 
 ```yaml
-manifestVersion: 1
-id: "l2-arbitrum"
-name: "Arbitrum One Node (Local)"
-version: "1.0.0"
-app_type: "l2_node"
-description: "Runs a local Arbitrum One L2 node, providing a local RPC endpoint if selected by the user as the source for Arbitrum One RPC."
-developer: "Cypherpunk Finance Community / Offchain Labs"
-website: "https://arbitrum.io"
-repo: "<link_to_cypherpunk_l2_arbitrum_plugin_repo>"
-support: "<link_to_support_channel>"
+id: arbitrum-one-node
+name: Arbitrum One Node
+version: "1.0.0" # Corresponds to a specific Arbitrum node software version bundle
+plugin_type: chain # This is a chain plugin for running a node
+description: Run a local Arbitrum One Layer 2 node.
+developer: Offchain Labs / Cypherpunk Finance Team
+# port: 8547 # Default Arbitrum RPC port, if exposed directly by this plugin for CypherpunkOS
+# ... other common manifest fields ...
 
 dependencies:
-  - "cap:ethereum_l1_rpc_available" # Generic capability for L1 RPC
+  # Requires an L1 RPC endpoint to be configured in CypherpunkOS
+  - capability: ethereum_l1_rpc_available
 
-port: 8547 # Default internal Arbitrum L2 RPC port
-path: "/l2-nodes/arbitrum"
-status_endpoint: "/app-status"
-
-exports:
-  - "APP_L2_ARBITRUM_RPC_URL=http://arbitrum_node:8547"
-  - "APP_L2_ARBITRUM_CHAIN_ID=42161"
-  - "APP_L2_ARBITRUM_NETWORK_NAME=Arbitrum One (Local Provider)"
-
-network_provided:
-  id: "arbitrum_one"
-  name: "Arbitrum One"
-  chain_id: 42161
-  type: "l2_optimistic_rollup"
-  l1_dependency_type: "ethereum_l1"
-  explorer_url: "https://arbiscan.io"
+# custom_fields:
+#   node_software_version: "vX.Y.Z" # Specific version of Arbitrum node software
+#   data_dir: "/data/arbitrum-one"
 ```
 
-## 5. `docker-compose.yml` (Conceptual for Arbitrum L2 Plugin)
+## 7. `docker-compose.yml` (Conceptual for Arbitrum L2 Plugin)
 
 ```yaml
 version: "3.7"
@@ -103,15 +100,15 @@ volumes:
   arbitrum_data:
 ```
 
-## 6. Key Implementation Details
+## 8. Key Implementation Details
 *   The Arbitrum node service will use the L1 RPC URL (`APP_ETHEREUM_L1_RPC_URL`) provided by CypherpunkOS.
 *   This plugin exports its local RPC details for CypherpunkOS to use if this local Arbitrum node is chosen as the active RPC provider for the `arbitrum_one` network type.
 
-## 7. User Interaction
+## 9. User Interaction
 *   User installs the "Arbitrum One Node (Local)" plugin if they want to run a local Arbitrum node.
 *   If no external Arbitrum RPC is set by the user, and this plugin is running and synced, apps selecting "Arbitrum One" will be configured to use this local node's RPC.
 
-## 8. Considerations
+## 10. Considerations
 *   **L1 RPC Dependency:** Stability is tied to the effective L1 RPC source.
 *   **Resource Usage:** Significant.
 *   **Sync Time:** Can be lengthy.

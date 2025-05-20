@@ -1,6 +1,10 @@
-# Uniswap Interface Plugin for Cypherpunk Finance
+# Plugin: Uniswap DeFi Application
 
-## 1. Objective
+## 1. Overview
+
+- **Plugin Name:** Uniswap Client
+- **Plugin Type:** App
+- **Version:** 1.0.0
 
 Provide a self-hosted interface for swapping tokens and managing liquidity on Uniswap (v2 and v3 primarily). The plugin will allow users to interact with Uniswap on Ethereum Mainnet (L1) or any compatible L2 network. CypherpunkOS will provide the necessary RPC endpoint (local via an active L1/L2 Node App or user-configured external) and subgraph URL (user-configured external or default public from this plugin's manifest) for the selected network.
 
@@ -26,13 +30,12 @@ Provide a self-hosted interface for swapping tokens and managing liquidity on Un
 ## 4. `cypherpunk-app.yml` (Uniswap Plugin Manifest)
 
 ```yaml
-manifestVersion: 1
-id: "uniswap-interface"
-name: "Uniswap Interface"
-version: "1.0.1"
-app_type: "defi_tool"
-description: "Swap tokens and manage Uniswap liquidity. Connects to your configured L1 or L2 node (local or external) and specified subgraph."
-developer: "Cypherpunk Finance Community / Adapted from Uniswap Labs"
+id: uniswap-app
+name: Uniswap Client
+version: 1.0.0
+plugin_type: app
+description: Swap tokens and manage liquidity on Uniswap.
+developer: Uniswap Labs / Cypherpunk Finance Team
 website: "https://app.uniswap.org"
 repo: "<link_to_cypherpunk_uniswap_plugin_repo>"
 support: "<link_to_support_channel>"

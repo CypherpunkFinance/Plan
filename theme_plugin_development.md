@@ -1,16 +1,38 @@
-# Cypherpunk Finance Theme Plugin Development Guide
+# Theme Extension Development for Cypherpunk Finance
 
-## 1. Introduction
-This guide outlines how to create and package theme plugins for the Cypherpunk Finance dashboard. Themes allow users to personalize the visual appearance of their CypherpunkOS interface, from colors and fonts to other stylistic elements.
+## 1. Overview
 
-Cypherpunk Finance will come bundled with a default "hacker" theme (neon green on black). Theme plugins provide a way for users and developers to create and share alternative appearances.
+- **Plugin Type:** Extension
+- **Category:** Theme
+- **Purpose:** To allow users to customize the visual appearance (look and feel) of the main CypherpunkOS Web UI (Dashboard).
+- **Mechanism:** Theme extensions provide CSS overrides and potentially other static assets (images, fonts) that CypherpunkOS can apply.
 
-The primary mechanism for theming is through CSS overrides, focusing on a set of official CSS variables provided by CypherpunkOS, supplemented by styling specific UI components where necessary.
+This document outlines the architecture and development process for UI Theme Extensions for CypherpunkOS. Themes are a specific type of **extension** that modify the CypherpunkOS dashboard's appearance.
 
-## 2. Theme Plugin Structure
-A theme plugin is a directory containing the necessary files to define and apply a theme.
+## 2. Key Concepts
 
-**Standard Directory Structure:**
+## 3. Theme Extension Structure
+
+A theme extension will be packaged as a standard CypherpunkOS plugin (Docker container structure, though it might not run a long-lived process). The key is its manifest and the assets it provides.
+
+*   **`cypherpunk-app.yml` (Manifest File):**
+    ```yaml
+    id: "my-custom-theme"
+    name: "My Custom Theme Name"
+    version: "1.0.0"
+    plugin_type: extension    # Themes are a type of extension
+    category: theme        # Specifies this extension is a theme
+    description: "A brief description of what the theme looks like."
+    developer: "Your Name/Handle"
+    # repo: "<url_to_theme_source_code_if_any>"
+    # website: "<url_to_theme_preview_or_info_if_any>"
+
+    custom_fields:
+      main_css_file: "theme/main.css"  # Path within the plugin's container to the primary CSS file
+      # thumbnail_image: "theme/thumbnail.png" # Optional: Path to a preview image for App Store
+      # assets_dir: "theme/assets/" # Optional: Path to a directory of other assets (images, fonts)
+    ```
+*   **Theme Assets Directory (e.g., `/theme/` inside the container):**
 ```
 my-custom-theme/
 ├── css/
@@ -22,34 +44,6 @@ my-custom-theme/
 ├── README.md             # Optional: Description, preview images, instructions
 └── LICENSE               # Optional: License for your theme
 ```
-
-**`cypherpunk-app.yml` (Manifest File):**
-The manifest file provides metadata for your theme plugin.
-
-```yaml
-id: com.yourname.my-custom-theme  # Unique identifier (reverse domain notation recommended)
-name: "My Custom Theme"            # Human-readable display name
-version: "1.0.0"                   # Semantic versioning (e.g., 1.0.0, 1.0.1-beta)
-app_type: theme                    # Must be 'theme' for theme plugins
-description: "A brief description of what your theme looks like or its inspiration."
-developer: "Your Name or Alias"
-website: "https://your-website.com/my-custom-theme" # Optional
-repo: "https://github.com/yourname/my-custom-theme" # Optional
-gallery:                           # Optional: List of preview images (paths relative to plugin root)
-  - "assets/preview1.png"
-  - "assets/screenshot.jpg"
-# target_cypherpunk_os_version: ">=1.0.0" # Optional: Specify compatible CypherpunkOS versions
-```
-
-## 3. Core Theming Concepts
-Our theming system is inspired by the flexibility of web technologies and the declarative nature of systems like VS Code themes.
-
-*   **CSS Overrides:** Themes work by providing a CSS file (`css/theme.css`) that overrides the default styles of the CypherpunkOS UI.
-*   **Official CSS Variables:** CypherpunkOS will define and expose a set of global CSS variables that control fundamental aspects of the UI's appearance (e.g., primary color, background color, text color, fonts). Themes should primarily target these variables for broad and consistent changes.
-    *   A comprehensive list of these variables will be available in the "CSS Variables Reference" section (see below) and in the main CypherpunkOS developer documentation.
-*   **Styling Specific Components:** For more granular control, themes can style specific UI components. CypherpunkOS will aim to use stable and well-defined CSS class names for major UI elements that themers can target. Avoid relying on highly specific or dynamically generated selectors.
-*   **Custom Assets:** Themes can include and use their own assets like background images or custom web fonts, placed in the `assets/` directory and referenced via relative paths in the CSS.
-*   **No JavaScript:** For security and simplicity, theme plugins are restricted to CSS and static assets only. No JavaScript execution from themes will be permitted in the initial implementation.
 
 ## 4. Developing Your Theme
 

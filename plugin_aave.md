@@ -1,16 +1,24 @@
-# Aave Interface Plugin for Cypherpunk Finance
+# Plugin: Aave DeFi Application
 
-## 1. Objective
+## 1. Overview
 
-Provide a self-hosted interface for lending, borrowing, and managing positions on Aave (primarily V2 and V3). The plugin will enable users to interact with Aave on Ethereum Mainnet (L1) or any compatible L2 network. CypherpunkOS will provide the necessary RPC endpoint (local via an active L1/L2 Node App or user-configured external) and subgraph URL (user-configured external or default public from this plugin's manifest) for the selected network.
+- **Plugin Name:** Aave Client
+- **Plugin Type:** App
+- **Version:** 1.0.0
 
-## 2. Source Material
+## 2. Purpose and Scope
+
+This plugin allows users to connect to the Aave V3 money markets on various supported networks (initially Ethereum L1) directly from their CypherpunkOS instance. It provides a graphical interface for supplying, borrowing, and managing positions. As an **app**, it operates with its own UI, launched from CypherpunkOS.
+
+## 3. Key Features
+
+## 4. Source Material
 
 *   **Primary Frontend Source:** The official Aave Interface repository: `aave/interface`.
 *   **Subgraph Information:** Aave's official subgraph deployment details for L1 and various L2s will be used for default `network_configs`.
 *   **Contract Addresses:** Aave documentation and `aave/aave-address-book` or similar repositories for correct contract addresses per network.
 
-## 3. Core Components & Dependencies (per running instance)
+## 5. Core Components & Dependencies (per running instance)
 
 1.  **Frontend Service (`frontend` in `docker-compose.yml`):**
     *   **Image:** A Docker image built from a fork of the `aave/interface` web app.
@@ -25,16 +33,15 @@ Provide a self-hosted interface for lending, borrowing, and managing positions o
     *   Implements `/app-status`.
     *   Reports basic status, app version, and currently configured network/RPC source.
 
-## 4. `cypherpunk-app.yml` (Aave Plugin Manifest)
+## 6. `cypherpunk-app.yml` (Aave Plugin Manifest)
 
 ```yaml
-manifestVersion: 1
-id: "aave-interface"
-name: "Aave Protocol Interface"
-version: "1.0.1"
-app_type: "defi_tool"
-description: "Lend, borrow, and manage Aave positions. Connects to your configured L1/L2 node (local or external) and specified subgraph."
-developer: "Cypherpunk Finance Community / Adapted from Aave Companies"
+id: aave-app
+name: Aave Client
+version: 1.0.0
+plugin_type: app
+description: Interact with the Aave V3 protocol.
+developer: Aave Community / Cypherpunk Finance Team
 website: "https://app.aave.com"
 repo: "<link_to_cypherpunk_aave_plugin_repo>"
 support: "<link_to_support_channel>"
@@ -83,7 +90,7 @@ path: "/aave"
 status_endpoint: "/app-status"
 ```
 
-## 5. `docker-compose.yml` (Conceptual for Aave Plugin)
+## 7. `docker-compose.yml` (Conceptual for Aave Plugin)
 
 ```yaml
 version: "3.7"
@@ -115,13 +122,13 @@ services:
 *   The Aave interface code must be adapted to use the injected `APP_SELECTED_...` environment variables for network parameters, RPC, and subgraph URLs, and `REACT_APP_...` variables for contract addresses corresponding to the selected network.
 *   The UI must clearly display the active network.
 
-## 6. Build & Deployment Process for the Plugin
+## 8. Build & Deployment Process for the Plugin
 (Similar to Uniswap: Fork, adapt for ENV var based config, Dockerize, define manifest with comprehensive `network_configs`, test across L1/L2s with various RPC/subgraph source combinations.)
 
-## 7. User Interaction Flow for Network Selection
+## 9. User Interaction Flow for Network Selection
 (Identical to Uniswap: User selects network in CypherpunkOS dashboard for Aave; CypherpunkOS injects correct effective RPC/subgraph URLs and configs.)
 
-## 8. Considerations & Challenges
+## 10. Considerations & Challenges
 *   **Clarity on RPC/Subgraph Source:** UI must be very clear about whether it's using local or external RPCs, and default public vs. user-provided subgraphs.
 *   **Frontend Fork Maintenance.**
 *   **Comprehensive and Accurate `network_configs`:** Crucial for Aave's multi-network support.
