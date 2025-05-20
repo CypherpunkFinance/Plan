@@ -11,24 +11,15 @@ Current self-hosting solutions for Ethereum L1 and L2 infrastructure can be comp
 CypherpunkOS and its ecosystem will be organized into the following primary repositories:
 
 *   **`cypherpunkos`**: This is the main repository for the CypherpunkOS core system.
-    *   Contains the main backend service responsible for installing and managing plugins (apps, extensions, nodes), coordinating the starting/stopping of their services, and fetching logs.
+    *   Contains the main backend service responsible for installing and managing plugins, coordinating the starting/stopping of their services, and fetching logs.
     *   Contains the primary frontend (Web UI/Dashboard) for browsing available plugins, installing/starting/stopping them, managing system settings, and viewing logs.
     *   A "plugin" is a general term for any installable component. The specific `plugin_type` in its manifest will define its behavior and how it integrates.
 
-*   **`cypherpunk-apps`**: This repository will host the official collection of "app" type plugins.
-    *   Apps are plugins that have their own distinct frontend/UI, separate from the main CypherpunkOS control panel. CypherpunkOS will proxy access to these UIs.
-    *   Examples include DeFi applications like Uniswap, Aave, Tornado Cash, or wallet management tools like SAFE.
-
-*   **`cypherpunkos-extensions`**: This repository will host official "extension" type plugins.
-    *   Extensions are plugins that primarily modify or enhance the CypherpunkOS control panel itself or provide backend functionalities without a dedicated UI.
-    *   Examples include RPC Provider plugins (Infura, Lava) which add new options to the CypherpunkOS network settings, or Theme plugins which change the look and feel of the CypherpunkOS control panel.
-
-*   **`cypherpunkos-nodes`**: This repository will host official "node" type plugins.
-    *   Node plugins are specifically for running and managing backend services that provide data or network access. This includes:
-        *   Blockchain nodes (e.g., Ethereum L1 clients like Nodeset, L2 node clients like Base or Arbitrum - category `l1_node` or `l2_node`).
-        *   Subgraph nodes for indexing blockchain data (e.g., a Graph Node instance syncing a specific Uniswap subgraph - category `subgraph_node`).
-        *   Other potential indexers or backend data providers.
-    *   They typically run as Dockerized services, provide necessary scripts and configurations for their operations, and expose endpoints (e.g., RPC, GraphQL) for CypherpunkOS and other plugins to use.
+*   **`cypherpunkos-plugins`**: This repository will host the official collection of all installable components: "app", "extension", and "node" type plugins. This repository will look and function similarly to the `umbrel-apps` repository. CypherpunkOS will pull from this repository to build its app store locally, using a method similar to how Umbrel processes its app repository.
+    *   Plugins will still have a `plugin_type` field in their manifest (e.g., `app`, `extension`, `node`) to define their behavior and integration with CypherpunkOS.
+    *   **Apps** are plugins that have their own distinct frontend/UI, separate from the main CypherpunkOS control panel (e.g., Uniswap, Aave). CypherpunkOS will proxy access to these UIs.
+    *   **Extensions** are plugins that primarily modify or enhance the CypherpunkOS control panel itself or provide backend functionalities without a dedicated UI (e.g., RPC Provider plugins, Theme plugins).
+    *   **Nodes** are plugins specifically for running and managing backend services that provide data or network access (e.g., Ethereum L1 clients, L2 node clients, Subgraph nodes).
 
 *   **`plan`**: (This current repository/directory)
     *   Contains all the planning documents, architecture diagrams, and detailed specifications for implementing CypherpunkOS and its various components.
