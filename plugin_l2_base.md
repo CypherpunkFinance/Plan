@@ -1,17 +1,18 @@
-# Plugin: Base L2 Node (Chain Plugin)
+# Plugin: Base L2 Node (Node Plugin)
 
 ## 1. Overview
 
 - **Plugin Name:** Base Mainnet Node
-- **Plugin Type:** Chain
+- **Plugin Type:** Node
+- **Category:** chain
 - **Version:** 1.0.0 (align with a specific Base node version, e.g., OP Stack version)
 - **Author:** Coinbase / Optimism / Cypherpunk Finance Team
 - **License:** (Check OP Stack / Base Node Software License)
-- **Description:** Installs and manages a local Base Mainnet Layer 2 node. This plugin functions as a **chain** plugin, providing an L2 network endpoint for CypherpunkOS and other installed applications.
+- **Description:** Installs and manages a local Base Mainnet Layer 2 node. This plugin functions as a **node** plugin of category `chain`, providing an L2 network endpoint for CypherpunkOS and other installed applications.
 
 ## 2. Purpose and Scope
 
-This plugin enables users to run their own Base Mainnet node, enhancing decentralization and providing a private RPC endpoint for their L2 interactions on the Base network. As a **chain** plugin, it focuses on node operations and exposing necessary services (like RPC) to the CypherpunkOS ecosystem.
+This plugin enables users to run their own Base Mainnet node, enhancing decentralization and providing a private RPC endpoint for their L2 interactions on the Base network. As a **node** plugin (category `chain`), it focuses on node operations and exposing necessary services (like RPC) to the CypherpunkOS ecosystem.
 
 ## 3. Key Features
 
@@ -34,13 +35,14 @@ This plugin enables users to run their own Base Mainnet node, enhancing decentra
     *   Queries the local `op-node`/`op-geth` for sync status and health.
     *   Reports logs.
 
-## 6. `cypherpunk-app.yml` (Base L2 Node Plugin Manifest)
+## 6. `cypherpunk-plugin.yml` (Base L2 Node Plugin Manifest)
 
 ```yaml
 id: base-mainnet-node
 name: Base Mainnet Node
 version: "1.0.0" # Corresponds to a specific Base node software version bundle
-plugin_type: chain # This is a chain plugin for running a node
+plugin_type: node # This is a node plugin
+category: chain # Specifies the type of node
 description: Run a local Base Mainnet Layer 2 node.
 developer: Coinbase / Cypherpunk Finance Team
 # port: 8551 # Default Base RPC port (often same as OP Stack), if exposed by this plugin

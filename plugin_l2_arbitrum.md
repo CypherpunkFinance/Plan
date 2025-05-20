@@ -1,17 +1,18 @@
-# Plugin: Arbitrum L2 Node (Chain Plugin)
+# Plugin: Arbitrum L2 Node (Node Plugin)
 
 ## 1. Overview
 
 - **Plugin Name:** Arbitrum One Node
-- **Plugin Type:** Chain
+- **Plugin Type:** Node
+- **Category:** chain
 - **Version:** 1.0.0 (align with a specific Arbitrum node version)
 - **Author:** Offchain Labs / Cypherpunk Finance Team
 - **License:** (Check Arbitrum Node Software License)
-- **Description:** Installs and manages a local Arbitrum One Layer 2 node. This plugin functions as a **chain** plugin, providing an L2 network endpoint for CypherpunkOS and other installed applications.
+- **Description:** Installs and manages a local Arbitrum One Layer 2 node. This plugin functions as a **node** plugin of category `chain`, providing an L2 network endpoint for CypherpunkOS and other installed applications.
 
 ## 2. Purpose and Scope
 
-This plugin enables users to run their own Arbitrum One node, enhancing decentralization and providing a private RPC endpoint for their L2 interactions. As a **chain** plugin, it focuses on node operations and exposing necessary services (like RPC) to the CypherpunkOS ecosystem.
+This plugin enables users to run their own Arbitrum One node, enhancing decentralization and providing a private RPC endpoint for their L2 interactions. As a **node** plugin (category `chain`), it focuses on node operations and exposing necessary services (like RPC) to the CypherpunkOS ecosystem.
 
 ## 3. Key Features
 
@@ -39,7 +40,8 @@ This plugin enables users to run their own Arbitrum One node, enhancing decentra
 id: arbitrum-one-node
 name: Arbitrum One Node
 version: "1.0.0" # Corresponds to a specific Arbitrum node software version bundle
-plugin_type: chain # This is a chain plugin for running a node
+plugin_type: node # This is a node plugin
+category: chain # Specifies the type of node
 description: Run a local Arbitrum One Layer 2 node.
 developer: Offchain Labs / Cypherpunk Finance Team
 # port: 8547 # Default Arbitrum RPC port, if exposed directly by this plugin for CypherpunkOS

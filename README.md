@@ -14,6 +14,8 @@ For the overall project repository structure and a detailed explanation of plugi
 
 -   **`extension_plugin_development.md`**: A guide for developing Extension Plugins, covering examples like RPC Providers (metadata-driven) and UI Themes (CSS-based), emphasizing frontend loading and manifest-driven integration (`plugin_type: extension`).
 
+-   **`node_plugin_development.md`**: A guide for developing Node Plugins, covering examples like L2 Blockchain Nodes and Subgraph Nodes (`plugin_type: node`).
+
 -   **`inbuilt_wallet.md`**: Details the design, features, and technical specifications for the integrated self-hosted wallet.
 
 -   **`l2_integration.md`**: Focuses on Layer 2 (L2) solution integration, including L2 chain plugins and L2-awareness for apps.
@@ -24,9 +26,9 @@ For the overall project repository structure and a detailed explanation of plugi
 
 -   **`plugin_infura.md`**: Details the Infura RPC Provider plugin (`plugin_type: extension`, `category: rpc_provider`).
 
--   **`plugin_l2_arbitrum.md`**: Planning for the Arbitrum L2 node plugin (`plugin_type: chain`).
+-   **`plugin_l2_arbitrum.md`**: Planning for the Arbitrum L2 node plugin (`plugin_type: node`, `category: chain`).
 
--   **`plugin_l2_base.md`**: Planning for the Base L2 node plugin (`plugin_type: chain`).
+-   **`plugin_l2_base.md`**: Planning for the Base L2 node plugin (`plugin_type: node`, `category: chain`).
 
 -   **`plugin_lava.md`**: Describes the Lava Network RPC Provider plugin (`plugin_type: extension`, `category: rpc_provider`).
 
@@ -46,6 +48,7 @@ plan/
 ├── inbuilt_wallet.md
 ├── l2_integration.md
 ├── mock_ui_plan.md
+├── node_plugin_development.md
 ├── plugin_aave.md
 ├── plugin_infura.md
 ├── plugin_l2_arbitrum.md

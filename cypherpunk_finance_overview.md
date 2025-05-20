@@ -11,7 +11,7 @@ Current self-hosting solutions for Ethereum L1 and L2 infrastructure can be comp
 CypherpunkOS and its ecosystem will be organized into the following primary repositories:
 
 *   **`cypherpunkos`**: This is the main repository for the CypherpunkOS core system.
-    *   Contains the main backend service responsible for installing and managing plugins (apps, extensions, chains, themes), coordinating the starting/stopping of their services, and fetching logs.
+    *   Contains the main backend service responsible for installing and managing plugins (apps, extensions, nodes), coordinating the starting/stopping of their services, and fetching logs.
     *   Contains the primary frontend (Web UI/Dashboard) for browsing available plugins, installing/starting/stopping them, managing system settings, and viewing logs.
     *   A "plugin" is a general term for any installable component. The specific `plugin_type` in its manifest will define its behavior and how it integrates.
 
@@ -19,13 +19,16 @@ CypherpunkOS and its ecosystem will be organized into the following primary repo
     *   Apps are plugins that have their own distinct frontend/UI, separate from the main CypherpunkOS control panel. CypherpunkOS will proxy access to these UIs.
     *   Examples include DeFi applications like Uniswap, Aave, Tornado Cash, or wallet management tools like SAFE.
 
-*   **`cypherpunk-extensions`**: This repository will host official "extension" type plugins.
+*   **`cypherpunkos-extensions`**: This repository will host official "extension" type plugins.
     *   Extensions are plugins that primarily modify or enhance the CypherpunkOS control panel itself or provide backend functionalities without a dedicated UI.
     *   Examples include RPC Provider plugins (Infura, Lava) which add new options to the CypherpunkOS network settings, or Theme plugins which change the look and feel of the CypherpunkOS control panel.
 
-*   **`cypherpunk-chains`**: This repository will host official "chain" type plugins.
-    *   Chain plugins are specifically for running and managing blockchain nodes (e.g., Ethereum L1 clients like Nodeset, L2 node clients like Base or Arbitrum).
-    *   They provide the necessary scripts and configurations for node operations and expose RPC endpoints for CypherpunkOS and other plugins to use.
+*   **`cypherpunkos-nodes`**: This repository will host official "node" type plugins.
+    *   Node plugins are specifically for running and managing backend services that provide data or network access. This includes:
+        *   Blockchain nodes (e.g., Ethereum L1 clients like Nodeset, L2 node clients like Base or Arbitrum - category `l1_node` or `l2_node`).
+        *   Subgraph nodes for indexing blockchain data (e.g., a Graph Node instance syncing a specific Uniswap subgraph - category `subgraph_node`).
+        *   Other potential indexers or backend data providers.
+    *   They typically run as Dockerized services, provide necessary scripts and configurations for their operations, and expose endpoints (e.g., RPC, GraphQL) for CypherpunkOS and other plugins to use.
 
 *   **`plan`**: (This current repository/directory)
     *   Contains all the planning documents, architecture diagrams, and detailed specifications for implementing CypherpunkOS and its various components.
@@ -126,7 +129,7 @@ CypherpunkOS and its ecosystem will be organized into the following primary repo
 *   **L2 Node Access:** Via installable local L2 node plugins, or a user-configured global external RPC for that L2 type.
 *   **Inbuilt Wallet:** A core feature of CypherpunkOS, providing a secure backend (potentially based on existing open-source solutions like Sequence Sidekick or a carefully vetted/developed custom solution) and UI for managing user funds (ETH, ERC20s) across L1 and configured L2s. It allows for key generation/import and transaction signing locally on the user's server.
 *   **App Store:** Marketplace for:
-    *   **Chain Plugins:** (e.g., Nodeset L1, Base L2, Arbitrum L2).
+    *   **Node Plugins:** (e.g., Nodeset L1, Base L2, Arbitrum L2, Uniswap Subgraph Node - running backend services).
     *   **App Plugins:** (e.g., Uniswap, Aave, Tornado Cash - with their own UIs).
     *   **Extension Plugins:** (e.g., Infura RPC, Lava RPC, UI Themes - extending CypherpunkOS functionality/UI).
 *   **Web-Based UI (Dashboard):**
@@ -146,11 +149,11 @@ CypherpunkOS and its ecosystem will be organized into the following primary repo
 **Plugin (App) System - "Cypherpunk App Framework":**
 
 1.  **Containerization & Asset Delivery:**
-    *   **App Plugins (`plugin_type: app`) and Chain Plugins (`plugin_type: chain`)** run their services in isolated Docker containers managed by CypherpunkOS.
+    *   **App Plugins (`plugin_type: app`) and Node Plugins (`plugin_type: node`)** run their services in isolated Docker containers managed by CypherpunkOS.
     *   **Extension Plugins (`plugin_type: extension`)** primarily consist of metadata (manifest) and static assets (CSS, JS, images). While they might be packaged and distributed via a minimal Docker image for consistency in the App Store, they typically do not run their own persistent Docker services. Their assets are loaded and utilized directly by the CypherpunkOS frontend or their configuration is processed by the CypherpunkOS backend based on their manifest.
 
 2.  **App Packaging:**
-    *   **`docker-compose.yml`:** Standard Docker Compose for service definition (primarily for `app` and `chain` plugins, can be minimal or absent for simple `extension` plugins that don't run services).
+    *   **`docker-compose.yml`:** Standard Docker Compose for service definition (primarily for `app` and `node` plugins, can be minimal or absent for simple `extension` plugins that don't run services).
     *   **`cypherpunk-plugin.yml` (Manifest File):** Crucial for all plugin types.
         *   `id`, `name`, `version`, `description`, `developer`, `website`, `repo`, `support`, `port` (if exposing UI/service), `gallery`, `path` (to UI entry point if `plugin_type: app`), `status_endpoint`.
         *   `plugin_type`: Defines how the plugin integrates and behaves. Key types:
@@ -159,13 +162,15 @@ CypherpunkOS and its ecosystem will be organized into the following primary repo
                 *   RPC Providers (e.g., Infura, Alchemy) that add configuration options to CypherpunkOS settings.
                 *   UI Themes that change the look and feel of the CypherpunkOS dashboard.
                 *   Other backend services or UI augmentations without a full separate UI.
-            *   `chain`: Manages a blockchain node (e.g., L1 node like Nodeset, L2 node like Base). Exposes RPC endpoints.
-            *   (Legacy types like `L1_node`, `L2_node`, `defi_app`, `privacy_tool`, `rpc_provider`, `theme` should be mapped to these new primary types, potentially with a clarifying `category` field if needed, e.g. `plugin_type: extension`, `category: rpc_provider` or `category: theme`).
-        *   `category` (Optional): Further specifies the type of plugin, especially for extensions (e.g., `rpc_provider`, `theme`).
+            *   `node`: Manages a backend service, typically providing data or network access (e.g., blockchain node, subgraph node, indexer).
+            *   (Legacy type `chain` should be mapped to `node`).
+        *   `category` (Optional): Further specifies the type of plugin. Examples:
+            *   For `plugin_type: extension`: `rpc_provider`, `theme`.
+            *   For `plugin_type: node`: `l1_node`, `l2_node`, `subgraph_node`, `indexer`.
         *   `supported_networks`: Lists network type IDs (e.g., `ethereum_l1`, `base_mainnet`). (Likely not applicable for `plugin_type: theme`)
         *   `network_configs`: Provides app-specific defaults (contract addresses, default public subgraph URLs) per network ID. This is fallback information if no user-specific external subgraph is configured.
         *   `dependencies`: Becomes less critical for basic RPC access if external RPCs are configured. Apps might still depend on `cap:ethereum_l1_rpc_available` or `cap:base_mainnet_rpc_available` to signal to CypherpunkOS which networks they are interested in receiving configurations for.
-    *   **`exports.sh` (Especially for Local Node Plugins like Nodeset and L2 Plugins):** These plugins export their RPC details. For Nodeset: `export APP_NODESET_L1_RPC_URL=...`, `APP_NODESET_L1_CHAIN_ID=...`. For an L2 plugin like `l2-base`: `export APP_L2_BASE_RPC_URL=...`, `APP_L2_BASE_CHAIN_ID=...`.
+    *   **`exports.sh` (Especially for `plugin_type: node` like Nodeset and L2 Node Plugins):** These plugins export their RPC details. For Nodeset: `export APP_NODESET_L1_RPC_URL=...`, `APP_NODESET_L1_CHAIN_ID=...`. For an L2 plugin like `l2-base`: `export APP_L2_BASE_RPC_URL=...`, `APP_L2_BASE_CHAIN_ID=...`.
 
 3.  **App Logging and Status Reporting:** (As previously defined). For apps using external RPCs, their status will primarily reflect frontend operation and connectivity to that external RPC.
 4.  **App Proxy & Security:** (As previously defined).
@@ -281,7 +286,7 @@ This plan outlines a phased approach to building Cypherpunk Finance.
 
 ## Documentation Structure Outline
 **I. Introduction**
-    *   Core Concepts (CypherpunkOS, Plugin Types: Apps, Extensions, Chains, Nodeset as default L1 chain plugin)
+    *   Core Concepts (CypherpunkOS, Plugin Types: Apps, Extensions, Nodes, Nodeset as default L1 chain plugin)
 
 **II. User Guide**
     *   2.  The CypherpunkOS Dashboard:
@@ -307,7 +312,7 @@ This plan outlines a phased approach to building Cypherpunk Finance.
 
 **III. Developer Guide**
     *   1.  Cypherpunk Finance Architecture:
-        *   **Plugin Categories: Apps, Extensions (RPC Providers, Themes, etc.), Chains (based on `plugin_type`).**
+        *   **Plugin Categories: Apps, Extensions, Nodes (based on `plugin_type` and `category`).**
         *   **Centralized Network Configuration and Endpoint Resolution by CypherpunkOS.**
         *   **Application Responsibility for In-App Network Switching.**
         *   **(New) Inbuilt Wallet Backend Architecture (Chosen approach, security considerations)**
@@ -323,10 +328,10 @@ This plan outlines a phased approach to building Cypherpunk Finance.
         *   Providing backend services.
         *   Example: RPC Provider extension, Theme extension.
         *   Manifest details: `plugin_type: extension`, optional `category`.
-    *   (Renumber) 5. Developing Chain Plugins (`plugin_type: chain`):
-        *   (Previously "Developing L2 Node Plugins", now generalized for all chain types including L1).
-        *   Packaging node software, data management, exposing RPCs.
-        *   Manifest details: `plugin_type: chain`.
+    *   (Renumber) 5. Developing Node Plugins (`plugin_type: node`):
+        *   (Previously "Developing Chain Plugins").
+        *   Packaging node software (blockchain clients, subgraph services, etc.), data management, exposing service endpoints (RPC, GraphQL).
+        *   Manifest details: `plugin_type: node`, specific `category` (e.g., `l1_node`, `l2_node`, `subgraph_node`).
     *   (Renumber) 6. Developing Theme Extensions (Specific type of `extension`):
         *   Theme structure (CSS, assets).
         *   Manifest file (`cypherpunk-plugin.yml` with `plugin_type: extension`, `category: theme`).
@@ -369,7 +374,7 @@ This plan outlines a phased approach to building Cypherpunk Finance.
 *   Centralizing network RPC configurations in CypherpunkOS while allowing apps to dynamically switch between them offers the best balance of user convenience (configure once) and app usability (switch easily in-app). Requires robust data passing from OS to App.
 *   Environment variables ... (e.g., `APP_ETHEREUM_L1_RPC_URL` from CypherpunkOS, `APP_L2_BASE_RPC_URL` from L2 plugin). Clarify that `APP_ETHEREUM_L1_RPC_URL` is the *effective* L1 RPC from CypherpunkOS.
 *   Pinning Docker images ... for both Cypherpunk Apps and the Ethereum clients managed by Nodeset (or other L1 apps) /L2 Plugins.
-*   Managing L2s as distinct plugins adds modularity but requires robust inter-plugin communication (or CypherpunkOS mediation) for RPC endpoints and app configuration.
+*   Managing L2s as distinct plugins (now `plugin_type: node`, `category: l2_node`) adds modularity but requires robust inter-plugin communication (or CypherpunkOS mediation) for RPC endpoints and app configuration.
 *   Local subgraph hosting per-app-per-L2 is likely too resource-intensive for most users; a strategy involving public L2 subgraphs by default for UI data is more pragmatic, while transactions use the local L2 node.
 *   (Add new) Integrating privacy tools like Tornado Cash requires extreme care in frontend security, note management, and user education due to inherent risks and regulatory attention.
 *   (Add new) A self-hosted wallet is a powerful feature for sovereignty but demands a very high standard of security in its design and implementation.
@@ -393,5 +398,5 @@ This plan outlines a phased approach to building Cypherpunk Finance.
 *   Community app stores are a supported concept, allowing broader app distribution.
 *   Comprehensive, real-time status display (sync progress, errors) and accessible logs are crucial for user trust and diagnostics in a self-hosted node/app environment.
 *   Detailed status/logging APIs are crucial for system observability.
-*   Managing L2s as distinct plugins adds modularity but requires robust inter-plugin communication for RPC endpoints and app configuration by CypherpunkOS.
+*   Managing L2s as distinct plugins (now `plugin_type: node`, `category: l2_node`) adds modularity but requires robust inter-plugin communication for RPC endpoints and app configuration by CypherpunkOS.
 *   Local subgraph hosting per-app-per-L2 is likely too resource-intensive for most users; a strategy involving public L2 subgraphs by default for UI data is more pragmatic, while transactions use the local L2 node. 

@@ -23,7 +23,7 @@ manifestVersion: 1
 id: "l2-base" # Unique ID for this L2 plugin
 name: "Base Node (Local)"
 version: "1.0.0"
-app_type: "l2_node"
+plugin_type: "node"
 description: "Runs a local Base L2 node, providing a local RPC endpoint for the Base network if selected by the user."
 developer: "Cypherpunk Finance Community"
 website: "https://base.org"
